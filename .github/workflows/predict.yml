@@ -29,7 +29,7 @@ on:
 
 env:
   TZ: America/Mexico_City
-  THESTATSAPI_KEY: ${{ secrets.THETATSAPI_KEY }}
+  THESTATSAPI_KEY: ${{ secrets.THESTATSAPI_KEY }}
 
 jobs:
   predict:
