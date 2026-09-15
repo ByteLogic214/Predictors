@@ -1,0 +1,56 @@
+name: football-predictor
+
+on:
+  schedule:
+    - cron: "0 11 * * *" # aprox 06:00 America/Mexico_City
+  workflow_dispatch:
+    inputs:
+      league:
+        description: Liga a ejecutar
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - Premier League
+          - La Liga
+          - Serie A
+          - Bundesliga
+          - Ligue 1
+          - Eredivisie
+          - Primeira Liga
+          - Pro League
+          - Süper Lig
+          - Bundesliga Austria
+      date:
+        description: Fecha YYYY-MM-DD, vacío = hoy
+        required: false
+        default: ""
+
+env:
+  TZ: America/Mexico_City
+  THESTATSAPI_KEY: ${{ secrets.THETATSAPI_KEY }}
+
+jobs:
+  predict:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run predictor
+        run: |
+          node src/predict.js \
+            --league "${{ github.event.inputs.league || 'all' }}" \
+            --date "${{ github.event.inputs.date || '' }}"
+
+      - name: Upload predictions artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: predictions-${{ github.run_id }}
+          path: predictions/
+          retention-days: 30
